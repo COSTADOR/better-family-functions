@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const messages: OpenAI.ChatCompletionMessageParam[] = [
 			{
 				role: 'system',
-				content: `Ты профессиональный переводчик. Переведи данные с английского на ${targetLang}, сохраняя точность и структуру. Отвечай ТОЛЬКО в JSON-формате.`
+				content: `Ты профессиональный переводчик. Переведи данные с русского на ${targetLang}, сохраняя точность и структуру. Отвечай ТОЛЬКО в JSON-формате.`
 			},
 			{
 				role: 'user',
