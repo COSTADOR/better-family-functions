@@ -3,15 +3,18 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
+	? process.env.ALLOWED_ORIGINS.split(',')
+	: [];
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-	res.setHeader('Access-Control-Allow-Origin', '*')
-	// another common pattern
-	// res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-	res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT')
-	res.setHeader(
-		'Access-Control-Allow-Headers',
-		'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-	)
+	const origin = req.headers.origin;
+	
+	if (origin && ALLOWED_ORIGINS.includes(origin)) {
+		res.setHeader('Access-Control-Allow-Origin', origin);
+	} else {
+		return res.status(403).json({ error: 'Access denied' });
+	}
 	
 	if (req.method === 'OPTIONS') {
 		return res.status(200).end();
