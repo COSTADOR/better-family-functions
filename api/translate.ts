@@ -9,8 +9,6 @@ const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
 	const origin = req.headers.origin;
-	console.log('CORS allowed for:', origin);
-	console.log('CORS allowed for:', ALLOWED_ORIGINS);
 	
 	if (origin && ALLOWED_ORIGINS.includes(origin)) {
 		res.setHeader('Access-Control-Allow-Origin', origin);
