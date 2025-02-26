@@ -43,7 +43,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const messages: OpenAI.ChatCompletionMessageParam[] = [
 			{
 				role: 'system',
-				content: `Ты профессиональный переводчик. Переводи текст с русского на ${targetLang}, сохраняя стиль, тон и структуру. Важно: если в оригинале используется обращение на "ты", сохраняй его в переводе. Отвечай ТОЛЬКО в JSON-формате.`
+				content: `Ты профессиональный переводчик. Переводи текст с русского на ${targetLang}, сохраняя стиль, тон и структуру. Eсли в оригинале используется обращение на "ты", сохраняй его в переводе.
+				Отвечай ТОЛЬКО в JSON-формате строго по следующей схеме:
+{
+  "title": "string",
+  "description": "string",
+  ...
+}`
 			},
 			{
 				role: 'user',
@@ -60,8 +66,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			store: true,
 		});
 		
-		console.log("🔹 OpenAI raw response:", JSON.stringify(completion, null, 2));
-		
 		const content = completion.choices[0]?.message?.content;
 		console.log("🔹 Extracted content:", content);
 		
@@ -69,7 +73,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			throw new Error("OpenAI API response is empty or null");
 		}
 		
-		const translatedData = JSON.parse(content).input;
+		const translatedData = JSON.parse(content);
 		res.status(200).json(translatedData);
 	} catch (error: any) {
 		res.status(500).json({ error: error.message });
