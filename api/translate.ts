@@ -61,6 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		});
 		
 		const content = completion.choices[0]?.message?.content;
+		console.log(content);
 		if (!content) {
 			throw new Error("OpenAI API response is empty or null");
 		}
