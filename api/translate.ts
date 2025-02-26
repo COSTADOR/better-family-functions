@@ -56,7 +56,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			messages: messages,
 			response_format: {
 				type: 'json_object'
-			}
+			},
+			store: true,
 		});
 		
 		const content = completion.choices[0]?.message?.content;
