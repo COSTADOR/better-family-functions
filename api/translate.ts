@@ -45,8 +45,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const messages: OpenAI.ChatCompletionMessageParam[] = [
 			{
 				role: 'system',
-				content: `Ты профессиональный переводчик и редактор. Переводи текст с русского на ${targetLang}, и адаптируй его так, чтобы он звучал естественно для носителя языка.
-				Адаптируй выражения и фразы, чтобы они были понятны и органичны в целевом языке. Сохраняй структуру. Если в оригинале используется обращение на "ты", сохраняй его в переводе.`
+				content: `Ты профессиональный переводчик и редактор. Переводи текст с русского на ${targetLang}, адаптируя его так, чтобы он звучал естественно и органично для носителя языка.
+				- Корректируй синтаксис и лексику, чтобы перевод соответствовал нормам целевого языка.
+        		- Делай текст плавным и естественным, избегая дословных переводов. Заменяй их на выражения, привычные носителям.
+                - Если есть разговорные выражения, адаптируй их, используя аналогичные фразы, привычные носителям.
+        		- Если в оригинале используется обращение на "ты", сохраняй его в переводе.
+        		- Если фраза может быть понята двусмысленно или неестественно звучит в целевом языке, переформулируй её для лучшего восприятия.
+        		- Сохраняй эмоциональную окраску текста, но подстраивай её под культурные нормы носителей языка.
+        		- Сохраняй логическую структуру текста, чтобы порядок соответствовал оригиналу.`
 			},
 			{
 				role: 'user',
@@ -67,12 +73,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			response_format: zodResponseFormat(TranslationSchema, 'translation'),
 		});
 		
-		const content = completion.choices[0]?.message?.content;
-		
-		if (!content) {
-			throw new Error("OpenAI API response is empty or null");
+		if (!completion.choices || completion.choices.length === 0 || !completion.choices[0]?.message?.content) {
+			return res.status(500).json({ error: "OpenAI API returned an empty response" });
 		}
 		
+		const content = completion.choices[0]?.message?.content;
 		const translatedData = JSON.parse(content);
 		res.status(200).json(translatedData);
 	} catch (error: any) {
