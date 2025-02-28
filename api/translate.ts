@@ -1,5 +1,7 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import OpenAI from 'openai';
+import {z} from 'zod';
+import {zodResponseFormat} from 'openai/helpers/zod';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -44,14 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			{
 				role: 'system',
 				content: `Ты профессиональный переводчик и редактор. Переводи текст с русского на ${targetLang}, и адаптируй его так, чтобы он звучал естественно для носителя языка.
-				Адаптируй выражения и фразы, чтобы они были понятны и органичны в целевом языке.
-				Сохраняй структуру. Если в оригинале используется обращение на "ты", сохраняй его в переводе.
-				Отвечай ТОЛЬКО в JSON-формате строго по следующей схеме:
-{
-  "title": "string",
-  "description": "string",
-  ...
-}`
+				Адаптируй выражения и фразы, чтобы они были понятны и органичны в целевом языке. Сохраняй структуру. Если в оригинале используется обращение на "ты", сохраняй его в переводе.`
 			},
 			{
 				role: 'user',
@@ -59,12 +54,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 			}
 		];
 		
+		const TranslationSchema = z.object({
+			title: z.string(),
+			description: z.string(),
+			importance: z.string().optional(),
+			steps: z.array(z.string()).optional(),
+		});
+		
 		const completion = await openai.chat.completions.create({
 			model: 'gpt-4o',
 			messages: messages,
-			response_format: {
-				type: 'json_object'
-			}
+			response_format: zodResponseFormat(TranslationSchema, 'translation'),
 		});
 		
 		const content = completion.choices[0]?.message?.content;
