@@ -25,7 +25,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 	}
 	
 	try {
+		console.log(req);
+		
 		const data = req.body;
+		
+		console.log(data);
 		
 		const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
 			method: 'POST',
