@@ -30,13 +30,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		const data = req.body;
 		
 		console.log(data);
+		console.log(typeof data);
 		
 		const googleResponse = await fetch(GOOGLE_SCRIPT_URL, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'text/plain;charset=utf-8'
 			},
-			body: JSON.stringify(data)
+			body: data
 		});
 		
 		const result = await googleResponse.json();
